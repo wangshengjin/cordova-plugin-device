@@ -30,6 +30,8 @@ import org.json.JSONObject;
 
 import android.provider.Settings;
 
+import com.ta.utdid2.android.utils.StringUtils;
+
 public class Device extends CordovaPlugin {
     public static final String TAG = "Device";
 
@@ -55,7 +57,7 @@ public class Device extends CordovaPlugin {
      */
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
         super.initialize(cordova, webView);
-        Device.uuid = getUuid();
+//        Device.uuid = getUuid();
     }
 
     /**
@@ -69,14 +71,21 @@ public class Device extends CordovaPlugin {
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
         if ("getDeviceInfo".equals(action)) {
             JSONObject r = new JSONObject();
-            r.put("uuid", Device.uuid);
+            if(!StringUtils.isEmpty(Device.uuid)) {
+              r.put("uuid", Device.uuid);
+            }
             r.put("version", this.getOSVersion());
             r.put("platform", this.getPlatform());
             r.put("model", this.getModel());
             r.put("manufacturer", this.getManufacturer());
-	        r.put("isVirtual", this.isVirtual());
+            r.put("isVirtual", this.isVirtual());
             r.put("serial", this.getSerialNumber());
             callbackContext.success(r);
+        }else if("getDeviceUUid".equals((action))){
+          Device.uuid = getUuid();
+          JSONObject r2 = new JSONObject();
+            r2.put("uuid", Device.uuid);
+          callbackContext.success(r2);
         }
         else {
             return false;
@@ -105,7 +114,7 @@ public class Device extends CordovaPlugin {
 
     /**
      * Get the device's Universally Unique Identifier (UUID).
-     *
+     * c
      * @return
      */
     public String getUuid() {
@@ -167,8 +176,8 @@ public class Device extends CordovaPlugin {
     }
 
     public boolean isVirtual() {
-	return android.os.Build.FINGERPRINT.contains("generic") ||
-	    android.os.Build.PRODUCT.contains("sdk");
+    return android.os.Build.FINGERPRINT.contains("generic") ||
+        android.os.Build.PRODUCT.contains("sdk");
     }
 
 }
